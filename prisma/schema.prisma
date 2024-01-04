@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+// npx prisma db push  - запушить схему в базу
+// npx prisma migrate dev --name init
+// npx prisma studio   - запусть графический интерфейс
+
+enum Role {
+  CLIENT
+  MASTER
+  ADMIN
+}
+
+// содержится информация пользователя о входе
+model User {
+  id    Int    @id @default(autoincrement())
+  email String @unique
+  hash String
+  salt String
+  createdAt DateTime @default(now())
+
+  account Account?
+}
+
+// информация пользователя, кроме информации о входе
+model Account {
+  id Int @id @default(autoincrement())
+
+  userId Int @unique 
+  user User @relation(fields: [userId], references: [id])
+  role Role
+  
+  nick String? @unique// ник / имя
+  speciality String? // специальность
+  description String? // описание / о себе
+  imgSrc String? @unique// уникальная ссылка на картинку
+  phone Int? // номер телефона
+  cardNum Int? // номер карты
+}
